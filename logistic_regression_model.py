@@ -1,30 +1,34 @@
 import pandas as pd
-import matplotlib.pyplot as plt
-from preprocessing import preprocess_sample, int_per_timebin
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import cross_val_score
 
-# Define the base path where the data is located
-base_path = 'nasa-data/'
+# Define your data paths
+DATA_PATH = 'nasa-data/'
 
-# Load metadata
-metadata = pd.read_csv(base_path + "metadata.csv")
+# Load the preprocessed data
+train_features = pd.read_csv(DATA_PATH + 'preprocessed_train_features.csv', index_col='sample_id')
+train_labels = pd.read_csv(DATA_PATH + 'train_labels.csv', index_col='sample_id')
 
-# Split metadata into training, validation, and testing
-metadata_train = metadata[metadata['split'] == 'train']
-metadata_val = metadata[metadata['split'] == 'val']
-metadata_test = metadata[metadata['split'] == 'test']
+# Define the target columns (assuming they are all columns in train_labels)
+target_cols = train_labels.columns.tolist()
 
-# Get the paths to the first 100 train feature CSV files
-first_100_paths = metadata_train['features_path'].iloc[:100]
+# Initialize dict to hold fitted models
+logreg_model_dict = {}
 
-# List to store the dataframes
-dfs = []
+# Split into binary classifier for each class
+for col in target_cols:
+    y_train_col = train_labels[col]  # Train on one class at a time
 
-# Load each CSV file into a pandas DataFrame and store it in the list
-for path in first_100_paths:
-  df = pd.read_csv(base_path + path)
-  dfs.append(df)
+    # Initialize the model
+    clf = LogisticRegression(penalty="l1", solver="liblinear", C=2, random_state=42)
 
-# Load the first 100 training labels
-train_labels = pd.read_csv(base_path + "/train_labels.csv", index_col="sample_id")[:100]
-target_cols = train_labels.columns
+    # Fit the model
+    logreg_model_dict[col] = clf.fit(train_features.values, y_train_col)
 
+    # Perform Cross-validation
+    scores = cross_val_score(clf, train_features.values, y_train_col, cv=5, scoring='neg_log_loss')
+
+    # Output the average log loss for each model
+    print(f"Average log loss for {col} model: {-scores.mean()}")  # Multiply by -1 as 'neg_log_loss' is negative
+
+# At this point, 'logreg_model_dict' is a dictionary of trained models, one for each target column.
