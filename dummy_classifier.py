@@ -1,5 +1,7 @@
 import pandas as pd
 import numpy as np
+from pprint import pprint
+
 from sklearn.dummy import DummyClassifier
 from sklearn.metrics import make_scorer, log_loss
 from sklearn.model_selection import StratifiedKFold, cross_val_score
@@ -42,6 +44,6 @@ dummy_clf = DummyClassifier(strategy="prior")
 
 print("Dummy model cross-validation average log-loss:")
 dummy_logloss = logloss_cross_val(dummy_clf, train_features, train_labels[target_cols])
-print(dummy_logloss[0])
+pprint(dummy_logloss[0])
 print("\nAggregate log-loss:")
-print(dummy_logloss[1])
+pprint(dummy_logloss[1])

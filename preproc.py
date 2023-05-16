@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import itertools
 from tqdm import tqdm
+
 from sklearn.preprocessing import MinMaxScaler
 
 DATA_PATH = 'nasa-data/'
@@ -11,11 +12,11 @@ metadata = pd.read_csv(DATA_PATH + 'metadata.csv')
 print("Metadata loaded.")
 
 # Filter the metadata to include only train and validation sets
-metadata_train = metadata[metadata['split'] == 'train'].head(200)
-metadata_val = metadata[metadata['split'] == 'val'].head(50)
+metadata_train = metadata[metadata['split'] == 'train']
+metadata_val = metadata[metadata['split'] == 'val']
 metadata = pd.concat([metadata_train, metadata_val])
 
-print("Metadata filtered for first 200 training and first 50 validation samples.")
+print("Metadata filtered for training and validation samples.")
 
 # Read the labels CSV files
 train_labels = pd.read_csv(DATA_PATH + 'train_labels.csv')
