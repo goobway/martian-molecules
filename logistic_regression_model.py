@@ -21,7 +21,7 @@ assert train_features.shape[0] == train_labels.shape[0] == 809
 target_cols = train_labels.columns.tolist()
 
 # Define stratified k-fold validation
-skf = StratifiedKFold(n_splits=5, random_state=42, shuffle=True)
+skf = StratifiedKFold(n_splits=5, random_state=44, shuffle=True)
 
 # Define log loss
 log_loss_scorer = make_scorer(log_loss, needs_proba=True)
