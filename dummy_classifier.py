@@ -8,16 +8,26 @@ from sklearn.model_selection import StratifiedKFold, cross_val_score
 
 DATA_PATH = 'nasa-data/'
 
+
 def logloss_cross_val(clf, X, y):
     # Generate a score for each label class
     log_loss_cv = {}
     for col in y.columns:
-        y_col = y[col]  # take one label at a time
-        log_loss_cv[col] = np.mean(
-            cross_val_score(clf, X.values, y_col, cv=skf, scoring=log_loss_scorer)
-        )
+        y_col = y[col]
+        log_loss_cv[col] = np.mean(cross_val_score(clf, X.values, y_col, cv=skf, scoring=log_loss_scorer))
     avg_log_loss = np.mean(list(log_loss_cv.values()))
     return log_loss_cv, avg_log_loss
+
+
+def accuracy_cross_val(clf, X, y):
+    # Generate a score for each label class
+    accuracy_cv = {}
+    for col in y.columns:
+        y_col = y[col]
+        accuracy_cv[col] = np.mean(cross_val_score(clf, X.values, y_col, cv=skf, scoring='accuracy'))
+    avg_accuracy = np.mean(list(accuracy_cv.values()))
+    return accuracy_cv, avg_accuracy
+
 
 # Load train features and labels
 train_features = pd.read_csv(DATA_PATH + 'preprocessed_train_features.csv', skiprows=2, index_col='sample_id')
@@ -47,3 +57,9 @@ dummy_logloss = logloss_cross_val(dummy_clf, train_features, train_labels[target
 pprint(dummy_logloss[0])
 print("\nAggregate log-loss:")
 pprint(dummy_logloss[1])
+print('')
+print("Dummy model cross-validation average accuracy:")
+dummy_accuracy = accuracy_cross_val(dummy_clf, train_features, train_labels[target_cols])
+pprint(dummy_accuracy[0])
+print("\nAggregate accuracy:")
+pprint(dummy_accuracy[1])
